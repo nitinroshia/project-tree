@@ -1,0 +1,53 @@
+apple@Apples-MacBook-Pro › ~/apps/video_automation_steps/pellacia_press/phase-03-editor › main✲
+╰╼ psql -U apple -d news_pipeline
+psql (14.15 (Homebrew))
+Type "help" for help.
+
+news_pipeline=# \d summaries
+                                              Table "public.summaries"
+      Column       |           Type           | Collation | Nullable |                    Default
+-------------------+--------------------------+-----------+----------+-----------------------------------------------
+ summary_id        | bigint                   |           | not null | nextval('summaries_summary_id_seq'::regclass)
+ summary_uuid      | uuid                     |           | not null | gen_random_uuid()
+ article_ids       | integer[]                |           | not null |
+ summary_text      | text                     |           | not null |
+ summary_embedding | vector(384)              |           | not null |
+ quality_score     | real                     |           |          |
+ summary_type      | character varying(50)    |           | not null |
+ summary_method    | character varying(100)   |           |          | 'bart-large-cnn'::character varying
+ model_name        | character varying(100)   |           | not null | 'all-MiniLM-L6-v2'::character varying
+ model_version     | character varying(50)    |           |          |
+ created_at        | timestamp with time zone |           | not null | now()
+ updated_at        | timestamp with time zone |           |          |
+ story_uuid        | uuid                     |           |          |
+ approved          | boolean                  |           |          | false
+ editor_notes      | text                     |           |          |
+Indexes:
+    "summaries_pkey" PRIMARY KEY, btree (summary_id)
+    "idx_summaries_approved" btree (approved)
+    "idx_summaries_article_ids" gin (article_ids)
+    "idx_summaries_created" btree (created_at DESC)
+    "idx_summaries_quality" btree (quality_score DESC)
+    "idx_summaries_type" btree (summary_type)
+    "idx_summaries_uuid" btree (summary_uuid)
+    "idx_summaries_vector_ivfflat" ivfflat (summary_embedding vector_cosine_ops) WITH (li
+sts='100')
+    "summaries_summary_uuid_key" UNIQUE CONSTRAINT, btree (summary_uuid)
+Check constraints:
+    "chk_article_ids_not_empty" CHECK (array_length(article_ids, 1) > 0)
+    "summaries_quality_score_check" CHECK (quality_score >= 0::double precision AND quali
+ty_score <= 1::double precision)
+    "summaries_summary_type_check" CHECK (summary_type::text = ANY (ARRAY['multi-article'
+::character varying, 'single'::character varying, 'L1'::character varying, 'L2'::characte
+r varying, 'L3'::character varying]::text[]))
+Referenced by:
+    TABLE "article_summaries" CONSTRAINT "article_summaries_summary_id_fkey" FOREIGN KEY
+(summary_id) REFERENCES summaries(summary_id) ON DELETE CASCADE
+    TABLE "editorial_queue" CONSTRAINT "editorial_queue_summary_uuid_fkey" FOREIGN KEY (s
+ummary_uuid) REFERENCES summaries(summary_uuid) ON DELETE CASCADE
+    TABLE "scripts" CONSTRAINT "scripts_summary_uuid_fkey" FOREIGN KEY (summary_uuid) REF
+ERENCES summaries(summary_uuid)
+Triggers:
+    update_summaries_updated_at BEFORE UPDATE ON summaries FOR EACH ROW EXECUTE FUNCTION
+update_updated_at_column()
+

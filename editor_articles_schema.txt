@@ -1,0 +1,75 @@
+
+apple@Apples-MacBook-Pro › ~/apps/video_automation_steps/pellacia_press/phase-03-editor › main✲
+╰╼ psql -U apple -d news_pipeline
+
+psql (14.15 (Homebrew))
+Type "help" for help.
+
+news_pipeline=# \d editor_articles
+                                Table "public.editor_articles"
+       Column        |            Type             | Collation | Nullable |      Default 
+---------------------+-----------------------------+-----------+----------+-------------------
+ editor_article_uuid | uuid                        |           | not null | gen_random_uuid()
+ source_article_uuid | uuid                        |           |          |
+ source_story_uuid   | uuid                        |           |          |
+ content_type        | text                        |           | not null |
+ headline            | text                        |           | not null |
+ post_text           | text                        |           | not null |
+ summary_text        | text                        |           |          |
+ image_headline      | text                        |           |          |
+ image_body_text     | text                        |           |          |
+ editor_name         | text                        |           | not null |
+ byline              | text                        |           |          |
+ word_count_post     | integer                     |           |          |
+ word_count_summary  | integer                     |           |          |
+ char_count_post     | integer                     |           |          |
+ source_attribution  | text[]                      |           |          |
+ original_urls       | text[]                      |           |          |
+ attribution_text    | text                        |           |          |
+ video_compatible    | boolean                     |           |          | false
+ social_compatible   | boolean                     |           |          | true
+ web_compatible      | boolean                     |           |          | true
+ post_type           | text                        |           | not null |
+ status              | text                        |           |          | 'draft'::text
+ platform_warnings   | jsonb                       |           |          | '[]'::jsonb
+ created_at          | timestamp without time zone |           |          | now()
+ updated_at          | timestamp without time zone |           |          | now()
+ approved_at         | timestamp without time zone |           |          |
+ published_at        | timestamp without time zone |           |          |
+ edited_headline     | text                        |           |          |
+ edited_html         | text                        |           |          |
+ use_edited_version  | boolean                     |           |          | false
+Indexes:
+    "editor_articles_pkey" PRIMARY KEY, btree (editor_article_uuid)
+    "idx_editor_articles_created" btree (created_at DESC)
+    "idx_editor_articles_editor" btree (editor_name)
+    "idx_editor_articles_source" btree (source_article_uuid)
+    "idx_editor_articles_status" btree (status)
+    "idx_editor_articles_type" btree (post_type)
+    "idx_editor_articles_use_edited" btree (use_edited_version) WHERE use_edited_version
+= true
+Check constraints:
+    "editor_articles_content_type_check" CHECK (content_type = ANY (ARRAY['original'::tex
+t, 'sourced'::text, 'enhanced'::text]))
+    "editor_articles_post_type_check" CHECK (post_type = ANY (ARRAY['breaking_news'::text
+, 'analysis'::text, 'market_update'::text, 'original_research'::text]))
+    "editor_articles_status_check" CHECK (status = ANY (ARRAY['draft'::text, 'approved'::
+text, 'published'::text, 'archived'::text]))
+Foreign-key constraints:
+    "editor_articles_source_article_uuid_fkey" FOREIGN KEY (source_article_uuid) REFERENC
+ES articles(article_uuid) ON DELETE SET NULL
+    "editor_articles_source_story_uuid_fkey" FOREIGN KEY (source_story_uuid) REFERENCES s
+tories(story_uuid) ON DELETE SET NULL
+Referenced by:
+    TABLE "ai_feedback" CONSTRAINT "ai_feedback_editor_article_uuid_fkey" FOREIGN KEY (ed
+itor_article_uuid) REFERENCES editor_articles(editor_article_uuid) ON DELETE CASCADE
+    TABLE "ai_metadata_cache" CONSTRAINT "ai_metadata_cache_editor_article_uuid_fkey" FOR
+EIGN KEY (editor_article_uuid) REFERENCES editor_articles(editor_article_uuid) ON DELETE
+SET NULL
+    TABLE "scripts" CONSTRAINT "scripts_editor_article_uuid_fkey" FOREIGN KEY (editor_art
+icle_uuid) REFERENCES editor_articles(editor_article_uuid)
+Triggers:
+    trigger_auto_attribution BEFORE INSERT OR UPDATE ON editor_articles FOR EACH ROW EXEC
+UTE FUNCTION auto_populate_attribution()
+    trigger_editor_articles_updated_at BEFORE UPDATE ON editor_articles FOR EACH ROW EXEC
+UTE FUNCTION update_editor_articles_timestamp()

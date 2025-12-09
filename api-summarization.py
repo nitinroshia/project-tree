@@ -113,7 +113,8 @@ def summarize():
                 summary_embedding,
                 quality_score,
                 summary_type,
-                story_uuid
+                story_uuid,
+                approved
             )
             VALUES (%s, %s, %s, %s, %s, %s)
             RETURNING summary_uuid, summary_id
@@ -123,7 +124,8 @@ def summarize():
             embedding_list,
             float(quality_score_calc),
             'multi-article',
-            story_uuid
+            story_uuid,
+            None
         ))
         
         summary_uuid, summary_id = cur.fetchone()
@@ -1617,7 +1619,29 @@ def ai_generate_metadata():
             return jsonify({'success': False, 'error': 'Article not found'}), 404
         
         source_headline, source_name, cleaned_html, source_url = article
-        
+       
+        cur.execute("""
+            SELECT article_id FROM articles WHERE article_uuid::text = %s
+        """, (source_article_uuid,))
+        article_id_row = cur.fetchone()
+
+        if article_id_row:
+            article_id = article_id_row[0]
+            
+            # Find summary containing this article
+            cur.execute("""
+                SELECT summary_uuid 
+                FROM summaries 
+                WHERE %s = ANY(article_ids)
+                ORDER BY created_at DESC 
+                LIMIT 1
+            """, (article_id,))
+            
+            summary_row = cur.fetchone()
+            summary_uuid_for_cache = str(summary_row[0]) if summary_row else None
+        else:
+            summary_uuid_for_cache = None
+
         # Load rules
         rules = load_metadata_rules()
         
@@ -1674,7 +1698,7 @@ def ai_generate_metadata():
         cur = conn.cursor()
         cur.execute("""
             INSERT INTO ai_metadata_cache (
-                source_article_uuid, metadata, confidence_scores, 
+                source_article_uuid, summary_uuid, metadata, confidence_scores, 
                 platform_validation, model_version, generation_mode
             ) VALUES (%s, %s, %s, %s, %s, %s)
             ON CONFLICT (source_article_uuid, generation_mode) 
@@ -1687,6 +1711,7 @@ def ai_generate_metadata():
             RETURNING cache_id
         """, (
             source_article_uuid,
+            summary_uuid_for_cache,
             json.dumps(metadata),
             json.dumps(confidence_scores),
             json.dumps(platform_validation),

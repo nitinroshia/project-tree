@@ -4,6 +4,7 @@ Phase 4 adds audio script generation and TTS synthesis to the editorial workflow
 
 Files Modified in Phase 3
 1. phase-03-editor/src/api/client.js
+Link: https://raw.githubusercontent.com/nitinroshia/project-tree/refs/heads/main/client.js
 Location: Line 78 (end of api object, before closing })
 Changes Added:
 javascript// Phase 4: Audio Generation
@@ -22,6 +23,7 @@ Purpose: API methods for audio generation endpoints
 Note: These call Phase 4 backend on port 5002. Ensure VITE_API_URL points to correct backend.
 
 2. phase-03-editor/src/components/ScriptGenerator.jsx
+Link: https://raw.githubusercontent.com/nitinroshia/project-tree/refs/heads/main/ScriptGenerator.jsx
 Location: New file created
 Purpose: Audio script generation UI component
 Features:
@@ -49,6 +51,7 @@ javascript{
 }
 
 3. phase-03-editor/src/components/SummaryReview.jsx
+Link: https://raw.githubusercontent.com/nitinroshia/project-tree/refs/heads/main/SummaryReview.jsx
 Location: Lines added after approval section
 Changes Added:
 javascript// Line 3 - Import
@@ -78,6 +81,7 @@ Behavior: Script generator appears after user clicks "Approve" button
 
 New Files in Phase 4
 4. phase-04-script/backend/api.py
+Link: https://raw.githubusercontent.com/nitinroshia/project-tree/refs/heads/main/api.py
 Purpose: Flask API server for audio generation (port 5002)
 Key Endpoints:
 
@@ -103,6 +107,7 @@ def get_db_conn():
     return psycopg2.connect(**DB_CONFIG, cursor_factory=RealDictCursor)
 
 5. phase-04-script/backend/script_generator.py
+Link: https://raw.githubusercontent.com/nitinroshia/project-tree/refs/heads/main/script_generator.py
 Purpose: Generates VTT caption files and manifest JSON
 Key Functions:
 
@@ -120,6 +125,7 @@ output/scripts/{uuid}/metadata.json - Generation info
 
 
 6. phase-04-script/backend/tts_generator.py
+Link: https://raw.githubusercontent.com/nitinroshia/project-tree/refs/heads/main/tts_generator.py
 Purpose: Google Cloud TTS integration with multi-project rotation
 Key Functions:
 
@@ -137,6 +143,7 @@ Supports all Google TTS models (Gemini, Chirp3, Neural2, Wavenet)
 
 
 7. phase-04-script/config/tts_config.json
+Link: https://raw.githubusercontent.com/nitinroshia/project-tree/refs/heads/main/tts_config.json
 Purpose: TTS project rotation configuration
 Structure:
 json{
@@ -149,6 +156,7 @@ json{
 Maintenance: Add GCP project credentials here
 
 8. phase-04-script/config/audio_presets.json
+Link: https://raw.githubusercontent.com/nitinroshia/project-tree/refs/heads/main/audio_presets.json
 Purpose: Defines available TTS models, voices, and languages
 Structure:
 json{
@@ -164,6 +172,7 @@ json{
 Note: Remove "standard" from models array - not a valid Google TTS model
 
 9. phase-04-script/config/tts_usage.json
+Link: https://raw.githubusercontent.com/nitinroshia/project-tree/refs/heads/main/tts_usage.json
 Purpose: Tracks TTS character consumption per project
 Auto-generated: Created on first run
 Structure:

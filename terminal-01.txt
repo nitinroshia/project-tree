@@ -1,0 +1,144 @@
+apple@Apples-MacBook-Pro › ~/apps/video_automation_steps/pellacia_press/phase-02-summarization › main✲
+╰╼ python api.py
+ * Serving Flask app 'api'
+ * Debug mode: on
+WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5001
+ * Running on http://192.168.29.126:5001
+Press CTRL+C to quit
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 972-345-414
+ERROR: column s.editor_article_uuid does not exist
+LINE 15:             LEFT JOIN editor_articles ea ON s.editor_article...
+                                                     ^
+HINT:  Perhaps you meant to reference the column "ea.editor_article_uuid".
+
+127.0.0.1 - - [09/Dec/2025 15:35:56] "GET /summaries HTTP/1.1" 500 -
+ERROR: column s.editor_article_uuid does not exist
+LINE 15:             LEFT JOIN editor_articles ea ON s.editor_article...
+                                                     ^
+HINT:  Perhaps you meant to reference the column "ea.editor_article_uuid".
+
+127.0.0.1 - - [09/Dec/2025 15:35:56] "GET /summaries HTTP/1.1" 500 -
+127.0.0.1 - - [09/Dec/2025 15:35:56] "GET /api/editorial/stories?limit=1 HTTP/1.1" 200 -
+127.0.0.1 - - [09/Dec/2025 15:35:56] "GET /api/editorial/articles?limit=1 HTTP/1.1" 200 -
+127.0.0.1 - - [09/Dec/2025 15:35:56] "GET /api/editorial/stories?limit=1 HTTP/1.1" 200 -
+127.0.0.1 - - [09/Dec/2025 15:35:56] "GET /api/editorial/articles?limit=1 HTTP/1.1" 200 -
+ERROR: column s.editor_article_uuid does not exist
+LINE 15:             LEFT JOIN editor_articles ea ON s.editor_article...
+                                                     ^
+HINT:  Perhaps you meant to reference the column "ea.editor_article_uuid".
+
+127.0.0.1 - - [09/Dec/2025 15:35:58] "GET /summaries HTTP/1.1" 500 -
+ERROR: column s.editor_article_uuid does not exist
+LINE 15:             LEFT JOIN editor_articles ea ON s.editor_article...
+                                                     ^
+HINT:  Perhaps you meant to reference the column "ea.editor_article_uuid".
+
+127.0.0.1 - - [09/Dec/2025 15:35:58] "GET /summaries HTTP/1.1" 500 -
+127.0.0.1 - - [09/Dec/2025 15:36:01] "GET /api/editorial/articles?search=&source=&limit=20&offset=0 HTTP/1.1" 200 -
+127.0.0.1 - - [09/Dec/2025 15:36:01] "GET /api/editorial/articles?search=&source=&limit=20&offset=0 HTTP/1.1" 200 -
+ERROR: column s.editor_article_uuid does not exist
+LINE 15:             LEFT JOIN editor_articles ea ON s.editor_article...
+                                                     ^
+HINT:  Perhaps you meant to reference the column "ea.editor_article_uuid".
+
+127.0.0.1 - - [09/Dec/2025 15:36:03] "GET /summaries HTTP/1.1" 500 -
+ERROR: column s.editor_article_uuid does not exist
+LINE 15:             LEFT JOIN editor_articles ea ON s.editor_article...
+                                                     ^
+HINT:  Perhaps you meant to reference the column "ea.editor_article_uuid".
+
+127.0.0.1 - - [09/Dec/2025 15:36:03] "GET /summaries HTTP/1.1" 500 -
+ERROR: column s.editor_article_uuid does not exist
+LINE 15:             LEFT JOIN editor_articles ea ON s.editor_article...
+                                                     ^
+HINT:  Perhaps you meant to reference the column "ea.editor_article_uuid".
+
+127.0.0.1 - - [09/Dec/2025 15:36:05] "GET /summaries HTTP/1.1" 500 -
+ERROR: column s.editor_article_uuid does not exist
+LINE 15:             LEFT JOIN editor_articles ea ON s.editor_article...
+                                                     ^
+HINT:  Perhaps you meant to reference the column "ea.editor_article_uuid".
+
+127.0.0.1 - - [09/Dec/2025 15:36:05] "GET /summaries HTTP/1.1" 500 -
+127.0.0.1 - - [09/Dec/2025 15:36:06] "GET /api/editorial/editor-articles?status=&post_type= HTTP/1.1" 200 -
+127.0.0.1 - - [09/Dec/2025 15:36:06] "GET /api/editorial/editor-articles?status=&post_type= HTTP/1.1" 200 -
+ERROR: column s.editor_article_uuid does not exist
+LINE 15:             LEFT JOIN editor_articles ea ON s.editor_article...
+                                                     ^
+HINT:  Perhaps you meant to reference the column "ea.editor_article_uuid".
+
+127.0.0.1 - - [09/Dec/2025 15:36:10] "GET /summaries HTTP/1.1" 500 -
+ERROR: column s.editor_article_uuid does not exist
+LINE 15:             LEFT JOIN editor_articles ea ON s.editor_article...
+                                                     ^
+HINT:  Perhaps you meant to reference the column "ea.editor_article_uuid".
+
+127.0.0.1 - - [09/Dec/2025 15:36:10] "GET /summaries HTTP/1.1" 500 -
+127.0.0.1 - - [09/Dec/2025 15:36:11] "GET /api/editorial/articles?search=&source=&limit=20&offset=0 HTTP/1.1" 200 -
+127.0.0.1 - - [09/Dec/2025 15:36:11] "GET /api/editorial/articles?search=&source=&limit=20&offset=0 HTTP/1.1" 200 -
+127.0.0.1 - - [09/Dec/2025 15:36:13] "OPTIONS /api/editorial/validate-summary HTTP/1.1" 200 -
+127.0.0.1 - - [09/Dec/2025 15:36:13] "POST /api/editorial/validate-summary HTTP/1.1" 200 -
+127.0.0.1 - - [09/Dec/2025 15:36:13] "GET /api/editorial/platform-limits HTTP/1.1" 200 -
+127.0.0.1 - - [09/Dec/2025 15:36:13] "GET /api/articles/6f2e532f-376b-4213-9e24-5b62994a3360 HTTP/1.1" 200 -
+127.0.0.1 - - [09/Dec/2025 15:36:13] "POST /api/editorial/validate-summary HTTP/1.1" 200 -
+127.0.0.1 - - [09/Dec/2025 15:36:13] "GET /api/editorial/platform-limits HTTP/1.1" 200 -
+127.0.0.1 - - [09/Dec/2025 15:36:13] "GET /api/articles/6f2e532f-376b-4213-9e24-5b62994a3360 HTTP/1.1" 200 -
+127.0.0.1 - - [09/Dec/2025 15:36:14] "OPTIONS /api/editorial/ai-generate-metadata HTTP/1.1" 200 -
+127.0.0.1 - - [09/Dec/2025 15:36:14] "POST /api/editorial/ai-generate-metadata HTTP/1.1" 200 -
+127.0.0.1 - - [09/Dec/2025 15:36:25] "OPTIONS /api/editorial/editor-articles HTTP/1.1" 200 -
+127.0.0.1 - - [09/Dec/2025 15:36:25] "POST /api/editorial/editor-articles HTTP/1.1" 201 -
+127.0.0.1 - - [09/Dec/2025 15:36:25] "GET /api/editorial/articles?search=&source=&limit=20&offset=0 HTTP/1.1" 200 -
+127.0.0.1 - - [09/Dec/2025 15:36:25] "GET /api/editorial/articles?search=&source=&limit=20&offset=0 HTTP/1.1" 200 -
+ERROR: column s.editor_article_uuid does not exist
+LINE 15:             LEFT JOIN editor_articles ea ON s.editor_article...
+                                                     ^
+HINT:  Perhaps you meant to reference the column "ea.editor_article_uuid".
+
+127.0.0.1 - - [09/Dec/2025 15:36:27] "GET /summaries HTTP/1.1" 500 -
+ERROR: column s.editor_article_uuid does not exist
+LINE 15:             LEFT JOIN editor_articles ea ON s.editor_article...
+                                                     ^
+HINT:  Perhaps you meant to reference the column "ea.editor_article_uuid".
+
+127.0.0.1 - - [09/Dec/2025 15:36:27] "GET /summaries HTTP/1.1" 500 -
+127.0.0.1 - - [09/Dec/2025 15:36:30] "GET /api/editorial/articles?search=&source=&limit=20&offset=0 HTTP/1.1" 200 -
+127.0.0.1 - - [09/Dec/2025 15:36:30] "GET /api/editorial/articles?search=&source=&limit=20&offset=0 HTTP/1.1" 200 -
+127.0.0.1 - - [09/Dec/2025 15:36:31] "OPTIONS /api/editorial/validate-summary HTTP/1.1" 200 -
+127.0.0.1 - - [09/Dec/2025 15:36:31] "OPTIONS /api/editorial/validate-summary HTTP/1.1" 200 -
+127.0.0.1 - - [09/Dec/2025 15:36:31] "GET /api/editorial/platform-limits HTTP/1.1" 200 -
+127.0.0.1 - - [09/Dec/2025 15:36:31] "POST /api/editorial/validate-summary HTTP/1.1" 200 -
+127.0.0.1 - - [09/Dec/2025 15:36:31] "GET /api/articles/6f2e532f-376b-4213-9e24-5b62994a3360 HTTP/1.1" 200 -
+127.0.0.1 - - [09/Dec/2025 15:36:31] "POST /api/editorial/validate-summary HTTP/1.1" 200 -
+127.0.0.1 - - [09/Dec/2025 15:36:31] "GET /api/editorial/platform-limits HTTP/1.1" 200 -
+127.0.0.1 - - [09/Dec/2025 15:36:31] "GET /api/articles/6f2e532f-376b-4213-9e24-5b62994a3360 HTTP/1.1" 200 -
+127.0.0.1 - - [09/Dec/2025 15:36:38] "OPTIONS /api/editorial/ai-generate-metadata HTTP/1.1" 200 -
+127.0.0.1 - - [09/Dec/2025 15:36:38] "POST /api/editorial/ai-generate-metadata HTTP/1.1" 200 -
+ERROR: column s.editor_article_uuid does not exist
+LINE 15:             LEFT JOIN editor_articles ea ON s.editor_article...
+                                                     ^
+HINT:  Perhaps you meant to reference the column "ea.editor_article_uuid".
+
+127.0.0.1 - - [09/Dec/2025 15:36:45] "GET /summaries HTTP/1.1" 500 -
+ERROR: column s.editor_article_uuid does not exist
+LINE 15:             LEFT JOIN editor_articles ea ON s.editor_article...
+                                                     ^
+HINT:  Perhaps you meant to reference the column "ea.editor_article_uuid".
+
+127.0.0.1 - - [09/Dec/2025 15:36:45] "GET /summaries HTTP/1.1" 500 -
+ERROR: column s.editor_article_uuid does not exist
+LINE 15:             LEFT JOIN editor_articles ea ON s.editor_article...
+                                                     ^
+HINT:  Perhaps you meant to reference the column "ea.editor_article_uuid".
+
+127.0.0.1 - - [09/Dec/2025 15:37:14] "GET /summaries HTTP/1.1" 500 -
+ERROR: column s.editor_article_uuid does not exist
+LINE 15:             LEFT JOIN editor_articles ea ON s.editor_article...
+                                                     ^
+HINT:  Perhaps you meant to reference the column "ea.editor_article_uuid".
+
+127.0.0.1 - - [09/Dec/2025 15:37:14] "GET /summaries HTTP/1.1" 500 -
+

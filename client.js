@@ -121,6 +121,15 @@ export const api = {
 
   // END PHASE 4
   // ============================================
+
+  // Add this to your api object
+  getQueueEditorArticles: async (status) => {
+    const url = status
+      ? `${BASE_URL}/api/editorial/queue/editor-articles?status=${status}`
+      : `${BASE_URL}/api/editorial/queue/editor-articles`
+    const response = await axios.get(url)
+    return response
+  }
 }
 
 export default apiClient

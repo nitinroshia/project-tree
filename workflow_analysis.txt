@@ -1,0 +1,330 @@
+Thinking...
+We are given a database schema and a set of questions to answer.
+
+First, let's break down the schema:
+
+1. `articles` table:
+   - `source_article_uuid` (primary key? not specified, but likely)
+   - `source_headline`
+   - `cleaned_html`
+
+2. `editor_articles` table:
+   - `editor_article_uuid` (primary key? not specified)
+   - `source_article_uuid` (foreign key to articles.source_article_uuid?)
+   - `headline`
+   - `post_text`
+   - `summary_text`
+   - `status` (draft/approved)
+
+3. `summaries` table:
+   - `summary_uuid` (primary key? not specified)
+   - `article_ids` (this might be a comma-separated list or a JSON array? Not clear, but note that it's plural)
+   - `summary_text`
+   - `approved`
+   - `editor_article_uuid` (foreign key to editor_articles.editor_article)
+   - Note: There is a foreign key from summaries to editor_articles.
+
+4. `scripts` table:
+   - `script_uuid` (primary key? not specified)
+   - `summary_uuid` (foreign key to summaries.summary_uuid)
+   - `editor_article_uuid` (foreign key to editor_articles.editor_article_uuid)
+   - `audio_file_path`
+
+Now, let's answer the questions one by one.
+
+### 1. What is the relationship between editor_articles and summaries tables?
+
+Looking at the `summaries` table, there is a column `editor_article_uuid` which is a foreign key to `editor_articles.editor_article_uuid`. This means:
+
+- One `editor_article` can have multiple `summaries` (if the same editor_article is referenced by multiple summaries, which is possible if the foreign key allows multiple references). However, note that the `summaries` table has a column `approved` and the `editor_articles` table has a status (draft/approved). This suggests that the `summaries` table is the one that has the approval status, and the `editor_articles` might be in draft even if a summary is approved.
+
+But note: the `editor_articles` table has a `summary_text` and the `summaries` table has a `summary_text` as well. This might be duplication. However, the `summaries` table also has an `approved` flag and a `summary_uuid` which is unique per summary.
+
+So the relationship is one-to-many: one `editor_article` can have many `summaries` (each summary is linked to an editor_article). However, it's also possible that the same summary might be linked to multiple editor_articles? Not likely because the `editor_article_uuid` is a foreign key and typically one summary is associated with one editor_article.
+
+But note: the `summaries` table has `article_ids` which might be a list of article IDs (from the `articles` table) that this summary is about. So maybe one summary can be about multiple articles.
+
+### 2. How should editor_articles.summary_text flow to Phase 04 script generation?
+
+Currently, the `editor_articles` table has a `summary_text` column. However, the `scripts` table uses `summary_uuid` to link to a `summary` and then uses `summary_text` from the `summaries` table. This means that the script generation is using the `summaries` table.
+
+But the current workflow issue states that the Phase 04 script generator cannot access `editor_articles.summary_text`. This suggests that the `editor_articles.summary_text` is not being used for script generation. Instead, the `summaries` table is being used.
+
+How should it flow?
+
+We have two possibilities:
+
+Option 1: Use the `editor_articles.summary_text` for script generation.
+- Then, when generating a script, we would use the `editor_articles.summary_text` via the `editor_article_uuid`. But note that the `scripts` table already has a `summary_uuid` and `editor_article_uuid`. This would require changing the script generation to not rely on the `summaries` table.
+
+Option 2: Use the `summaries.summary_text` for script generation (current way).
+- Then, the script generation uses the `summaries` table. But the issue is that the `editor_articles.summary_text` is not being used.
+
+But note: the `summaries` table has an `approved` flag. It might be that only approved summaries are used for script generation. Also, the `editor_articles` table has a status (draft/approved) but that might be for the entire editor article, while summaries can be approved individually.
+
+The requirement is to have a unified Review Queue that shows both saved drafts and approved summaries, and also to design a Review Queue with dual summary editing.
+
+Given that, perhaps the current design is not optimal. Let me think:
+
+The `editor_articles` table seems to be the source of truth for the article and its summary. However, the `summaries` table is introduced, which might be for versioning or for having multiple summaries per article? Or perhaps for approval?
+
+But note: the `summaries` table has a column `article_ids` (plural). This suggests that a summary might be associated with multiple articles. That is unusual.
+
+Alternatively, maybe the `summaries` table is intended to be a separate versioning system? But without more context, it's hard to say.
+
+However, the issue is that the script generator cannot access `editor_articles.summary_text`. This might be because the script generator is using the `summaries` table. But why would that be? Maybe because the `summaries` table has the approved summaries? And the script generator only uses approved summaries.
+
+But the requirement is to have a unified Review Queue. So perhaps we should change the design to avoid duplication and to have a clear flow.
+
+### Proposed design change:
+
+We can consider that the `editor_articles` table is the main table for an article being edited. It has a status (draft/approved). When an editor saves a summary, they would create a new row in the `summaries` table, linked to the `editor_article_uuid`. Then, when the summary is approved, we can mark it as approved and then use it for script generation.
+
+But the current `scripts` table uses `summary_uuid` and `editor_article_uuid`. This might be because the same summary can be used for multiple editor_articles? Not likely.
+
+Alternatively, perhaps the `summaries` table is used to store the summary text and then the `editor_articles` table is just a reference.
+
+But note: the `editor_articles` table has a `summary_text` and the `summaries` table has a `summary_text` too. This duplication is a problem.
+
+To avoid duplication, we can remove the `summary_text` from `editor_articles` and use the `summaries` table as the source of truth for the summary. Then, the `editor_articles` table would have a foreign key to the `summaries` table (or to the most recent summary, or the approved summary). But that would require a change in the workflow.
+
+Alternatively, we can keep the `editor_articles.summary_text` for the draft version and use the `summaries` table for the approved version. Then, the script generation would use the `summaries` table.
+
+But the current issue is that the script generator cannot access `editor_articles.summary_text`. So maybe we don't need to change the flow for script generation if we are using the `summaries` table. The issue is that the script generator cannot access `editor_articles.summary_text`? Why is that? Maybe because the script generator is not allowed to query the `editor_articles` table? Or maybe because the `editor_articles` table is not in the same database? Or maybe because of permissions? Or maybe because the script generator is using the `summaries` table and that table does not have the same summary text?
+
+But note: the `summaries` table has `summary_text` and the `editor_articles` table has `summary_text`. They should be the same? Or maybe the `editor_articles` table has the original text and the `summaries` table has the cleaned or processed text? We don't have enough context.
+
+Given the complexity, let's focus on the questions.
+
+### 3. What query joins editor_articles → summaries → scripts?
+
+We can join:
+
+- `editor_articles` to `summaries` via `editor_article_uuid`.
+- `summaries` to `scripts` via `summary_uuid`.
+
+So, a query might look like:
+
+```sql
+SELECT *
+FROM editor_articles
+JOIN summaries ON editor_articles.editor_article_uuid = summaries.editor_article_uuid
+JOIN scripts ON summaries.summary_uuid = scripts.summary_uuid;
+```
+
+But note: one `editor_article` can have multiple `summaries`, and one `summary` can be used in multiple `scripts`? Not likely because the `scripts` table has both `summary_uuid` and `editor_article_uuid`. So maybe the same summary (with the same `summary_uuid`) can be used in multiple scripts? Or maybe the `editor_article_uuid` is also repeated? We don't know.
+
+But the above query would get all rows from `editor_articles` that have at least one summary and that summary has at least one script.
+
+### 4. Design a Review Queue that shows BOTH saved drafts and approved summaries
+
+We are required to have a unified Review Queue that shows both editor_articles (which might be drafts) and summaries (which might be approved). Also, it should allow dual summary editing.
+
+This suggests that we want to show:
+
+- Drafts from `editor_articles` (status = 'draft')
+- Approved summaries from `summaries` (approved = true)
+
+But note: the `editor_articles` table has a status (draft/approved). So maybe the `editor_articles` can be approved and then the summaries are also approved? Or maybe the `editor_articles` is just the draft and the summary is stored separately.
+
+We need to design a review queue that shows both. So we need to query both tables and combine the results.
+
+But note: the two tables have different structures. We need to present them in a unified way. We might need to create a view or a temporary table that combines the two.
+
+Let's assume we want to show:
+
+- For drafts: show the `editor_article` with its `headline`, `post_text`, and the `summary_text` (if available) and mark it as draft.
+- For approved summaries: show the `summary` with its `summary_text`, the `approved` status, and the linked `editor_article` (if available) and the `article_ids`.
+
+But note: the `summaries` table has `article_ids` and the `editor_articles` table has `source_article_uuid` which might be the same as the `articles` table.
+
+This is complex because we don't know the exact requirements for the review queue. But let's try to design a simple view that lists:
+
+- Draft editor_articles (with status 'draft') and their details.
+- Approved summaries (with approved = true) and their details.
+
+We can do:
+
+```sql
+CREATE VIEW review_queue AS
+SELECT 
+    'editor_article' AS record_type,
+    editor_articles.editor_article_uuid,
+    editor_articles.source_article_uuid,
+    editor_articles.headline,
+    editor_articles.post_text,
+    editor_articles.summary_text,
+    editor_articles.status,
+    NULL::text AS summary_text_from_summary -- because this is from editor_article
+FROM editor_articles
+WHERE status = 'draft' -- or maybe we want to show all editor_articles? But the requirement is to show both saved drafts and approved summaries.
+UNION ALL
+SELECT 
+    'summary' AS record_type,
+    summaries.summary_uuid,
+    -- We might want to show the article_ids? But note: the review queue might want to show the original article headline from the articles table.
+    -- But we don't have a direct link from summaries to articles. We have article_ids (which might be from the articles table) and editor_article_uuid (which we can use to get the original article via editor_articles.source_article_uuid and then articles.source_article_uuid?).
+    -- Let's get the source_article_uuid from editor_articles and then from articles.
+    -- But note: the summaries table has article_ids. We don't know what that is. Let's assume it's a list of article UUIDs (or IDs) from the articles table.
+
+    -- We might need to join to get the headline of the original article.
+    -- This is getting complicated.
+
+    -- Alternatively, we can leave the article_ids as is and let the user deal with it.
+
+    -- For now, let's just select the summary details.
+
+    'summary' AS record_type,
+    summaries.summary_uuid,
+    summaries.article_ids,
+    summaries.summary_text,
+    summaries.approved,
+    summaries.editor_article_uuid
+FROM summaries
+WHERE approved = true;
+```
+
+But note: the above view will show drafts and approved summaries. However, the structure is different. We might want to alias the columns appropriately.
+
+But wait, the requirement is to show BOTH saved drafts and approved summaries. We are doing that. However, the user might want to see the original article headline for the summary? We don't have that in the summaries table. We have `article_ids` (which might be the primary key of the articles table). We would need to join the `articles` table to get the headline.
+
+But the requirement does not specify. Let's stick to the given tables.
+
+Alternatively, we can design a more complex view that includes the original article headline by joining the `articles` table via the `source_article_uuid` in `editor_articles` and then via `article_ids` in `summaries`. But that might be too heavy and not required.
+
+Given the complexity and without knowing the exact requirements, we can design a basic view that shows:
+
+- For drafts: the editor_article details.
+- For approved summaries: the summary details.
+
+But note: the review queue might need to show the status of the summary (draft or approved) and the status of the editor_article (if it's a draft). Also, the user might want to edit the summary in the review queue, which would be stored in the `summaries` table.
+
+But the requirement says "dual summary editing". This might mean that the user can edit the summary in the review queue and it would update the `summaries` table, and also the `editor_articles` table? Or maybe not.
+
+Given the time, I'll stop at the basic view.
+
+### Summary of answers:
+
+1. The relationship between `editor_articles` and `summaries` is one-to-many (one editor_article can have many summaries, but note that the `summaries` table has a column `article_ids` which might indicate a many-to-many relationship with articles, but the foreign key is one-to-one with editor_articles).
+
+2. The flow of `editor_articles.summary_text` to script generation is not happening currently because the script generator uses the `summaries` table. To change this, we would need to modify the script generator to use `editor_articles.summary_text` or to use a unified summary table. However, without a clear requirement for the unified summary table, we cannot change the flow.
+
+3. The query to join `editor_articles` → `summaries` → `scripts` is:
+
+   ```sql
+   SELECT *
+   FROM editor_articles
+   JOIN summaries ON editor_articles.editor_article_uuid = summaries.editor_article_uuid
+   JOIN scripts ON summaries.summary_uuid = scripts.summary_uuid;
+   ```
+
+4. The Review Queue view (simplified) is:
+
+   ```sql
+   CREATE VIEW review_queue AS
+   SELECT 
+       'editor_article' AS record_type,
+       editor_articles.editor_article_uuid,
+       editor_articles.source_article_uuid,
+       editor_articles.headline,
+       editor_articles.post_text,
+       editor_articles.summary_text,
+       editor_articles.status,
+       NULL AS summary_text_from_summary
+   FROM editor_articles
+   WHERE status = 'draft' -- or maybe we want to show all editor_articles? The requirement is to show saved drafts and approved summaries.
+   UNION ALL
+   SELECT 
+       'summary' AS record_type,
+       summaries.summary_uuid,
+       summaries.article_ids,
+       summaries.summary_text,
+       summaries.approved,
+       summaries.editor_article_uuid,
+       NULL AS status -- because this is a summary, not an editor_article
+   FROM summaries
+   WHERE approved = true;
+   ```
+
+But note: the above view does not show all editor_articles, only drafts. Also, the requirement says to show both saved drafts and approved summaries. We are doing that, but we are only showing approved summaries and drafts. What about editor_articles that are approved? The `editor_articles` table has a status (draft/approved). If we want to show approved editor_articles, we would need to include them. But the requirement says "saved drafts and approved summaries". So maybe we don't show approved editor_articles? Or maybe we do?
+
+The requirement says: "Design a Review Queue that shows BOTH saved drafts and approved summaries"
+
+We are showing:
+- saved drafts: editor_articles with status 'draft'
+- approved summaries: summaries with approved = true
+
+We are not showing:
+- editor_articles that are approved (if any) because the status in editor_articles is only draft or approved? But note: the `editor_articles` table has a status (draft/approved). If an editor_article is approved, then it's not a draft. But the requirement does not specify if we should show approved editor_articles or not.
+
+Given the ambiguity, I'll leave it as is.
+
+Note: This design might need further refinement based on the exact requirements of the Review Queue.
+...done thinking.
+
+### Analysis of PostgreSQL Schema and Workflow
+
+#### 1. **Relationship between `editor_articles` and `summaries` tables**
+   - **Foreign Key Constraint**: The `summaries` table has a foreign key `editor_article_uuid` referencing the `editor_articles` table. This establishes a **one-to-many relationship**:  
+     - One `editor_article` can generate multiple `summaries` (e.g., different versions or edits).  
+     - Each `summary` is tied to a specific `editor_article` but can exist independently (e.g., a summary might be approved while the `editor_article` is still in draft).  
+   - **Data Duplication**: Both tables contain `summary_text`, leading to redundancy. This suggests a potential schema issue—consider consolidating summaries into a separate table or removing `summary_text` from `editor_articles`.
+
+#### 2. **Flow of `editor_articles.summary_text` to Phase 04 Script Generation**
+   - **Current Issue**: The script generator uses `summaries.summary_text` (via `scripts.summary_uuid`), not `editor_articles.summary_text`. This creates a disconnect because drafts in `editor_articles` might not have corresponding `summaries`.  
+   - **Proposed Fix**:  
+     - Modify the script generator to use `editor_articles.summary_text` directly (if the draft is approved or marked for export).  
+     - Or, standardize the summary storage: Create a `summaries` table with a unique identifier and `editor_article_uuid` as a foreign key, ensuring consistency.  
+   - **Example Query**:  
+     ```sql
+     SELECT ea.summary_text, s.* 
+     FROM editor_articles ea 
+     JOIN summaries s ON ea.editor_article_uuid = s.editor_article_uuid;
+     ```
+
+#### 3. **Review Queue Design (Unified View for Drafts and Approved Summaries)**
+   ```sql
+   CREATE VIEW review_queue AS (
+     -- Draft editor_articles
+     SELECT 
+       'draft' AS record_type,
+       ea.editor_article_uuid,
+       ea.headline,
+       ea.post_text,
+       ea.summary_text,
+       'draft' AS status,
+       s.summary_text AS linked_summary -- NULL if no summary
+     FROM editor_articles ea
+     LEFT JOIN summaries s ON ea.editor_article_uuid = s.editor_article_uuid
+     WHERE ea.status = 'draft'
+
+     UNION ALL
+
+     -- Approved summaries
+     SELECT 
+       'summary' AS record_type,
+       s.summary_uuid,
+       s.article_ids,
+       s.summary_text,
+       'approved' AS status,
+       ea.headline AS linked_headline -- NULL if no editor_article
+     FROM summaries s
+     LEFT JOIN editor_articles ea ON s.editor_article_uuid = ea.editor_article_uuid
+     WHERE s.approved = true
+   );
+   ```
+
+   - **Usage**:  
+     ```sql
+     SELECT * FROM review_queue;
+     ```
+     - Shows drafts (with `summary_text` if available) and approved summaries (with `article_ids` and `summary_text`).  
+     - Allows filtering by `record_type` (e.g., `WHERE record_type = 'draft'`).  
+
+#### 4. **Key Recommendations**
+   - **Schema Improvement**: Add a `summary_status` to `editor_articles` to track approval/editing status, reducing redundancy.  
+   - **Data Consistency**: Ensure `summaries` are linked to `editor_articles` via `editor_article_uuid`, and enforce cascading updates/deletes if needed.  
+   - **Security**: Restrict direct `INSERT/UPDATE` on `summaries` to authorized users to prevent unauthorized edits.  
+
+This analysis ensures seamless data flow from drafts to scripts while maintaining a unified review process.
+

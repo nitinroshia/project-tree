@@ -1,0 +1,158 @@
+-- Check current schema
+\d summaries
+
+-- Should be:
+approved BOOLEAN DEFAULT NULL  -- NULL = pending, true = approved, false = rejected
+```
+
+---
+
+### **Issue 2: AI Metadata not visible in Queue**
+
+**Problem:** After generating AI metadata (editor_articles), it doesn't appear in `/queue` page.
+
+**Root Cause:** The developer's response CONFIRMS this - `/queue` only queries `summaries` table, NOT `editor_articles`.
+
+**The Fix They Provided:** New `/queue` page with TWO TABS.
+
+**What You Need:**
+1. Apply the new `QueuePage.jsx` code (with tabs)
+2. Backend needs new endpoint: `/api/editorial/queue/editor-articles`
+3. Frontend needs new API method: `getQueueEditorArticles()`
+
+**Did New Developer Fix This?** ✅ YES - Their QueuePage.jsx has Tab 2 for Editor Articles.
+
+---
+
+### **Issue 3: Cannot edit drafts on Editor Articles page**
+
+**Problem:** Editor Articles page shows cards but no edit functionality.
+
+**Root Cause:** `EditorArticlesPage.jsx` has `JSON.parse()` error (line 137-142).
+
+**The Fix They Provided:** Remove the faulty JSON.parse() logic.
+
+**Did New Developer Fix This?** ✅ YES - They provided exact line numbers to fix.
+
+---
+
+### **Issue 4: Multiple drafts with same UUID clutter**
+
+**Problem:** When AI metadata is generated multiple times for same article, you see duplicate cards.
+
+**Root Cause:** `editor_articles` can have multiple rows with same `article_uuid` but different `editor_article_uuid`.
+
+**Your Request:** Latest draft with dropdown to see older versions.
+
+**Did New Developer Fix This?** ❌ NO - They did NOT address version management.
+
+**What's Missing:** Group by `article_uuid`, show only latest `created_at`, add dropdown for history.
+
+---
+
+## **Gap Analysis: What Developer IGNORED**
+
+### ❌ **Not Fixed:**
+
+1. **Default status on summary creation** (Issue 1)
+   - No code provided to fix "rejected" appearing on new summaries
+   
+2. **Edit workflow after approval** (Issue 1 part 2)
+   - No logic for "send back to pending" after editing approved summary
+   
+3. **Version management for editor_articles** (Issue 4)
+   - No grouping/latest-version logic
+   - No dropdown for version history
+
+4. **AI Metadata approval propagation** (Issue 2)
+   - They fixed dual-table approval for summaries → editor_articles
+   - But didn't fix: Approving AI metadata on `/articles` page should show in `/queue`
+
+---
+
+## **What New Developer DID Fix**
+
+### ✅ **Fixed:**
+
+1. **Duplicate UUIDs in queue** - Removed JOIN, separate tabs
+2. **Editor Articles tab visibility** - New tab in QueuePage.jsx
+3. **JSON.parse() error** - Removed faulty parsing in EditorArticlesPage.jsx
+4. **Dual-table approval** - Approving summary now approves linked editor_articles
+
+---
+
+## **Critical Questions for New Developer**
+
+### **Question 1: Summary Status on Creation**
+```
+When creating a summary via /api/editorial/summarize, 
+what value does summaries.approved get set to?
+
+Expected: NULL (pending)
+Current: ??? (appears as "rejected")
+
+Where is the bug?
+```
+
+### **Question 2: AI Metadata Approval Flow**
+```
+When user clicks "Approve" on AI metadata in /articles page:
+1. Does it update editor_articles.status = 'approved'?
+2. Does it link editor_articles.summary_uuid to parent summary?
+3. Should this approved metadata appear in /queue Tab 2?
+
+Current behavior: Approved, but NOT visible in /queue
+Expected behavior: Should appear in /queue Tab 2 (Editor Articles)
+```
+
+### **Question 3: Edit After Approval**
+```
+When user edits an approved summary:
+1. Should status revert to pending?
+2. Should it require re-approval?
+3. What's the workflow?
+
+Current: Can edit, but status stays "approved"
+Expected: ???
+```
+
+### **Question 4: Version Management**
+```
+editor_articles can have multiple rows with same article_uuid:
+- Version 1: Generated at 10:00 AM
+- Version 2: Regenerated at 11:00 AM
+- Version 3: Regenerated at 12:00 PM
+
+Should /editor-articles page show:
+A) All 3 as separate cards (current)
+B) Only Version 3 with dropdown to see 1 & 2 (your request)
+C) Delete old versions when regenerating (destructive)
+
+Which do you want?
+```
+
+---
+
+## **My Recommendation**
+
+### **Step 1: Use OpenCode/Groq to Map Current State**
+
+Run this prompt in OpenCode:
+```
+Analyze Phase 3 editorial workflow:
+
+Files to analyze:
+- phase-02-summarization/api.py (backend endpoints)
+- phase-03-editor/src/pages/QueuePage.jsx
+- phase-03-editor/src/pages/ArticlesPage.jsx
+- phase-03-editor/src/pages/EditorArticlesPage.jsx
+- phase-03-editor/src/components/SummaryReview.jsx
+
+Questions:
+1. When is summaries.approved set? What are possible values?
+2. How does AI metadata approval work? Which endpoint?
+3. How are editor_articles linked to summaries?
+4. What's the complete approval workflow?
+5. Where is version management for editor_articles?
+
+Generate a workflow diagram showing all states and transitions.

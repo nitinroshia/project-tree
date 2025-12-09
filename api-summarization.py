@@ -150,13 +150,19 @@ def summarize():
 
 @app.route('/summaries', methods=['GET'])
 def get_summaries():
-    """Get all summaries from database."""
+    """Get all summaries for queue (no joins - pure summaries only)."""
     try:
         conn = psycopg2.connect(DB_CONN)
         cur = conn.cursor()
         cur.execute("""
-            SELECT summary_uuid, summary_text, quality_score,
-                   summary_type, created_at, approved, editor_notes
+            SELECT 
+                summary_uuid, 
+                summary_text, 
+                quality_score,
+                summary_type, 
+                created_at, 
+                approved, 
+                editor_notes
             FROM summaries
             ORDER BY created_at DESC
             LIMIT 100
@@ -504,7 +510,7 @@ def get_stories():
 
 @app.route('/api/editorial/summaries/<summary_uuid>/approve', methods=['PUT'])
 def approve_summary(summary_uuid):
-    """Approve summary for next phase."""
+    """Approve summary AND linked editor articles."""
     try:
         data = request.json
         editor_notes = data.get('editor_notes', '').strip()
@@ -513,7 +519,7 @@ def approve_summary(summary_uuid):
         conn = psycopg2.connect(DB_CONN)
         cur = conn.cursor()
         
-        # Update summaries table
+        # Approve summary
         cur.execute("""
             UPDATE summaries
             SET approved = TRUE, editor_notes = %s
@@ -529,6 +535,13 @@ def approve_summary(summary_uuid):
             return jsonify({'error': 'Summary not found'}), 404
         
         story_uuid = result[0]
+        
+        # Approve linked editor_articles
+        cur.execute("""
+            UPDATE editor_articles 
+            SET status = 'approved', approved_at = NOW()
+            WHERE summary_uuid = %s
+        """, (summary_uuid,))
         
         # Insert into editorial queue
         cur.execute("""
@@ -1958,6 +1971,181 @@ OUTPUT (JSON only):
         import traceback
         traceback.print_exc()
         return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/api/editorial/queue/editor-articles', methods=['GET'])
+def get_queue_editor_articles():
+    """Get editor articles for queue tab 2."""
+    try:
+        status = request.args.get('status', '').strip()
+        
+        conn = psycopg2.connect(DB_CONN)
+        cur = conn.cursor()
+        
+        query = """
+            SELECT 
+                editor_article_uuid,
+                summary_uuid,
+                source_article_uuid,
+                headline,
+                post_text,
+                summary_text,
+                image_headline,
+                hashtags,
+                status,
+                created_at,
+                approved_at
+            FROM editor_articles
+            WHERE 1=1
+        """
+        params = []
+        
+        if status:
+            query += " AND status = %s"
+            params.append(status)
+        
+        query += " ORDER BY created_at DESC LIMIT 100"
+        
+        cur.execute(query, params)
+        articles = cur.fetchall()
+        cur.close()
+        conn.close()
+        
+        result = []
+        for row in articles:
+            result.append({
+                'editor_article_uuid': str(row[0]),
+                'summary_uuid': str(row[1]) if row[1] else None,
+                'source_article_uuid': str(row[2]) if row[2] else None,
+                'headline': row[3],
+                'post_text': row[4],
+                'summary_text': row[5],  # TTS summary
+                'image_headline': row[6],
+                'hashtags': row[7],
+                'status': row[8],
+                'created_at': row[9].isoformat() if row[9] else None,
+                'approved_at': row[10].isoformat() if row[10] else None
+            })
+        
+        return jsonify({'editor_articles': result}), 200
+        
+    except Exception as e:
+        print(f"ERROR: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/editorial/editor-articles/latest', methods=['GET'])
+def get_latest_editor_articles():
+    """Get only the latest version of each editor article grouped by source."""
+    try:
+        status = request.args.get('status', '').strip()
+        
+        conn = psycopg2.connect(DB_CONN)
+        cur = conn.cursor()
+        
+        # Get latest version for each source_article_uuid
+        query = """
+            WITH ranked_articles AS (
+                SELECT 
+                    *,
+                    ROW_NUMBER() OVER (
+                        PARTITION BY source_article_uuid 
+                        ORDER BY created_at DESC
+                    ) as rn
+                FROM editor_articles
+                WHERE 1=1
+        """
+        params = []
+        
+        if status:
+            query += " AND status = %s"
+            params.append(status)
+        
+        query += """
+            )
+            SELECT 
+                editor_article_uuid,
+                source_article_uuid,
+                headline,
+                status,
+                created_at,
+                updated_at,
+                (SELECT COUNT(*) 
+                 FROM editor_articles ea2 
+                 WHERE ea2.source_article_uuid = ranked_articles.source_article_uuid
+                ) as version_count
+            FROM ranked_articles
+            WHERE rn = 1
+            ORDER BY created_at DESC
+        """
+        
+        cur.execute(query, params)
+        articles = cur.fetchall()
+        cur.close()
+        conn.close()
+        
+        result = []
+        for row in articles:
+            result.append({
+                'editor_article_uuid': str(row[0]),
+                'source_article_uuid': str(row[1]),
+                'headline': row[2],
+                'status': row[3],
+                'created_at': row[4].isoformat() if row[4] else None,
+                'updated_at': row[5].isoformat() if row[5] else None,
+                'version_count': row[6],
+                'is_latest': True
+            })
+        
+        return jsonify({'editor_articles': result}), 200
+        
+    except Exception as e:
+        print(f"ERROR: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/editorial/editor-articles/versions/<source_article_uuid>', methods=['GET'])
+def get_article_versions(source_article_uuid):
+    """Get all versions of editor articles for a specific source article."""
+    try:
+        conn = psycopg2.connect(DB_CONN)
+        cur = conn.cursor()
+        
+        cur.execute("""
+            SELECT 
+                editor_article_uuid,
+                headline,
+                status,
+                created_at,
+                updated_at,
+                ROW_NUMBER() OVER (ORDER BY created_at DESC) as version_number
+            FROM editor_articles
+            WHERE source_article_uuid = %s
+            ORDER BY created_at DESC
+        """, (source_article_uuid,))
+        
+        versions = cur.fetchall()
+        cur.close()
+        conn.close()
+        
+        result = []
+        for row in versions:
+            result.append({
+                'editor_article_uuid': str(row[0]),
+                'headline': row[1],
+                'status': row[2],
+                'created_at': row[3].isoformat() if row[3] else None,
+                'updated_at': row[4].isoformat() if row[4] else None,
+                'version_number': row[5]
+            })
+        
+        return jsonify({'versions': result}), 200
+        
+    except Exception as e:
+        print(f"ERROR: {e}")
+        return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5001, debug=True)

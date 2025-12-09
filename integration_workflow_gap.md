@@ -125,10 +125,11 @@ editor_articles.summary_text
 - Needed Props: `summaryText, editorSummaryText` (rename)
 - Link: https://raw.githubusercontent.com/nitinroshia/project-tree/refs/heads/main/ScriptGenerator.jsx
 
-**3. QueuePage.jsx (probably)**
+**3. QueuePage.jsx**
 - Location: `phase-03-editor/src/pages/QueuePage.jsx`
 - Current: Fetches only summaries
 - Needed: Fetch summaries + JOIN editor_articles
+- Link: https://raw.githubusercontent.com/nitinroshia/project-tree/refs/heads/main/QueuePage.jsx
 
 ### **Backend (Phase 02):**
 
@@ -154,7 +155,7 @@ cur.execute("""
     ORDER BY s.created_at DESC
 """)
 ```
-
+- Link: https://raw.githubusercontent.com/nitinroshia/project-tree/refs/heads/main/api.py
 ---
 
 ## 🎯 **SOLUTION ARCHITECTURE**

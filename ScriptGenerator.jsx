@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { api } from '../api/client';
 
-const ScriptGenerator = ({ summaryText, summaryUuid, editorArticleUuid, imageSummaryText }) => {
+const ScriptGenerator = ({ summaryText, summaryUuid, editorArticleUuid, editorSummaryText }) => {
   const [loading, setLoading] = useState(false);
   const [script, setScript] = useState(null);
   const [audioPresets, setAudioPresets] = useState(null);
-  const [useImageSummary, setUseImageSummary] = useState(false);
+  const [useEditorSummary, setUseEditorSummary] = useState(false); const [useImageSummary, setUseImageSummary] = useState(false);
 
   // Audio params
   const [model, setModel] = useState('gemini-2.0-pro-tts');
@@ -35,7 +35,7 @@ const ScriptGenerator = ({ summaryText, summaryUuid, editorArticleUuid, imageSum
     setLoading(true);
     setError('');
 
-    const textToUse = useImageSummary ? imageSummaryText : summaryText;
+    const textToUse = useEditorSummary ? editorSummaryText : summaryText;
 
     try {
       const res = await api.generateScript({
@@ -86,14 +86,14 @@ const ScriptGenerator = ({ summaryText, summaryUuid, editorArticleUuid, imageSum
 
       {error && <div className="mb-4 p-3 bg-red-50 text-red-700 rounded">{error}</div>}
 
-      {imageSummaryText && (
+      {editorSummaryText && (
         <label className="flex items-center gap-2 mb-4">
           <input
             type="checkbox"
-            checked={useImageSummary}
-            onChange={(e) => setUseImageSummary(e.target.checked)}
+            checked={useEditorSummary}
+            onChange={(e) => setUseEditorSummary(e.target.checked)}
           />
-          <span>Use image summary for audio</span>
+          <span>Use editor article summary (TTS optimized)</span>
         </label>
       )}
 

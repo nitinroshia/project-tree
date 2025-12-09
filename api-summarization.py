@@ -747,6 +747,30 @@ def create_editor_article():
         
         # Optional fields
         source_article_uuid = data.get('source_article_uuid')
+        summary_uuid = None
+        if source_article_uuid:
+            # First get article_id from article_uuid
+            cur.execute("""
+                SELECT article_id FROM articles 
+                WHERE article_uuid::text = %s
+            """, (source_article_uuid,))
+            
+            article_id_row = cur.fetchone()
+            
+            if article_id_row:
+                article_id = article_id_row[0]
+                
+                # Now find summary containing this article
+                cur.execute("""
+                    SELECT summary_uuid 
+                    FROM summaries 
+                    WHERE %s = ANY(article_ids)
+                    ORDER BY created_at DESC 
+                    LIMIT 1
+                """, (article_id,))
+        
+        summary_row = cur.fetchone()
+        summary_uuid = summary_row[0] if summary_row else None
         source_story_uuid = data.get('source_story_uuid')
         summary_text = data.get('summary_text', '').strip()
         image_headline = data.get('image_headline', '').strip()
@@ -782,7 +806,7 @@ def create_editor_article():
         
         cur.execute("""
             INSERT INTO editor_articles (
-                source_article_uuid, source_story_uuid, content_type,
+                summary_uuid, source_article_uuid, source_story_uuid, content_type,
                 headline, post_text, summary_text,
                 image_headline, image_body_text,
                 editor_name, byline,
@@ -794,7 +818,7 @@ def create_editor_article():
             VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
             RETURNING editor_article_uuid, created_at, attribution_text
         """, (
-            source_article_uuid, source_story_uuid, content_type,
+            summary_uuid, source_article_uuid, source_story_uuid, content_type,
             headline, post_text, summary_text,
             image_headline, image_body_text,
             editor_name, byline,

@@ -1,0 +1,198 @@
+
+apple@Apples-MacBook-Pro › ~/apps/video_automation_steps/pellacia_press › main✲
+╰╼ tree -L 6 -I 'node_modules|venv|pgvector|__pycache__'
+.
+├── bridge
+│   ├── article_poller.py
+│   ├── bridge.log
+│   ├── requirements.txt
+│   └── state.json
+├── context
+│   ├── ARCHITECTURE_MAP.md
+│   ├── FACTS.md
+│   ├── MVP_ROADMAP.md
+│   ├── OLLAMA_RULES.md
+│   └── PHASE_REGISTRY.md
+├── phase-01-ingestion
+│   ├── config
+│   │   ├── cleanup-config.json
+│   │   ├── image-generation-schema.json
+│   │   ├── image-generation.json
+│   │   └── topics.json
+│   ├── docs
+│   │   ├── CHANGELOG.md
+│   │   ├── directory-structure.md
+│   │   ├── FILE-VERSIONS-CHECKLIST.md
+│   │   ├── FILES-UPDATED.md
+│   │   ├── IMAGE-GENERATION-EXPLAINED.md
+│   │   ├── INTEGRATION-CHECKLIST.md
+│   │   ├── naming-conventions.md
+│   │   ├── phase-01-embedding-upgrade.md
+│   │   ├── PROFESSIONAL-SYSTEM.md
+│   │   ├── RICH-TEXT-EDITOR.md
+│   │   ├── SECURITY.md
+│   │   └── SETUP.md
+│   ├── migrations
+│   │   ├── 001_add_embeddings.sql
+│   │   └── 002_add_article_embeddings_array.sql
+│   ├── node-server.log
+│   ├── output
+│   │   └── images
+│   │       ├── d13c6d80-eb3a-4886-b461-568515120644_700x520.png
+│   │       ├── d13c6d80-eb3a-4886-b461-568515120644_730x520.png
+│   │       └── d13c6d80-eb3a-4886-b461-568515120644_760x520.png
+│   ├── package-lock.json
+│   ├── package.json
+│   ├── public
+│   │   └── index.html
+│   ├── README.md
+│   ├── server.js
+│   ├── services
+│   │   └── embed-server
+│   │       ├── embed-server.log
+│   │       ├── requirements.txt
+│   │       └── server.py
+│   ├── src
+│   │   ├── cleanup
+│   │   │   ├── manual-cleanup.js
+│   │   │   └── scheduled.js
+│   │   ├── database
+│   │   │   ├── cleanup-queries.sql
+│   │   │   ├── embeddings.js
+│   │   │   ├── queries-v2.js
+│   │   │   └── schema-v3.sql
+│   │   ├── embed
+│   │   │   ├── chunker.js
+│   │   │   ├── client.js
+│   │   │   └── vector-store.js
+│   │   ├── html
+│   │   │   ├── cleaner.js
+│   │   │   └── template.html
+│   │   ├── image
+│   │   │   └── generator.js
+│   │   ├── pipeline
+│   │   │   ├── embedding-pipeline.js
+│   │   │   └── processor.js
+│   │   └── tag
+│   │       └── ner.js
+│   ├── temporary_docs
+│   │   ├── COMMAND.md
+│   │   └── project_tree.md
+│   └── test
+│       └── test-pipeline.js
+├── phase-02-summarization
+│   ├── ai_prefill
+│   │   └── AI_FIELD_CONFIG.json
+│   ├── ai_summarization.md
+│   ├── api.py
+│   ├── context
+│   │   ├── agents
+│   │   │   ├── critical_agent.md
+│   │   │   ├── senior_chunk_01.md
+│   │   │   ├── senior_chunk_02.md
+│   │   │   ├── senior_chunk_03.md
+│   │   │   └── top_level_engineer.md
+│   │   ├── archive
+│   │   │   ├── 2025-11-30_analysis.md
+│   │   │   ├── gemini_recommendation.md
+│   │   │   └── implementation_plan_clean.md
+│   │   ├── HANDOFF.md
+│   │   ├── METADATA_RULES.md
+│   │   ├── PHASE_COMPLETE.md
+│   │   ├── PROJECT_MANAGER.md
+│   │   ├── session.md
+│   │   └── sessions
+│   ├── migrations
+│   │   ├── phase-2.5-ai-metadata.sql
+│   │   └── summaries_table.sql
+│   ├── quality_checker.py
+│   ├── requirements.txt
+│   ├── scripts
+│   │   ├── end_session.sh
+│   │   └── start_session.sh
+│   ├── story_watcher.py
+│   └── summarizer.py
+├── phase-03-editor
+│   ├── index.html
+│   ├── migrations
+│   │   └── editorial.sql
+│   ├── package-lock.json
+│   ├── package.json
+│   ├── postcss.config.js
+│   ├── README.md
+│   ├── src
+│   │   ├── api
+│   │   │   └── client.js
+│   │   ├── App.jsx
+│   │   ├── components
+│   │   │   ├── ApprovalQueue.jsx
+│   │   │   ├── ArticleEditor.jsx
+│   │   │   ├── ArticleList.jsx
+│   │   │   ├── BulkFieldOperations.jsx
+│   │   │   ├── ConfidenceScore.jsx
+│   │   │   ├── FieldValidationIndicator.jsx
+│   │   │   ├── GenerationHistory.jsx
+│   │   │   ├── HashtagEditor.jsx
+│   │   │   ├── LiveCharCounter.jsx
+│   │   │   ├── OriginalArticleWriter.jsx
+│   │   │   ├── PlatformCustomization.jsx
+│   │   │   ├── PlatformPreview.jsx
+│   │   │   ├── ScriptGenerator.jsx
+│   │   │   ├── StoryManager.jsx
+│   │   │   ├── SummarizationPanel.jsx
+│   │   │   ├── SummaryReview.jsx
+│   │   │   └── TipTapEditor.jsx
+│   │   ├── index.css
+│   │   ├── main.jsx
+│   │   └── pages
+│   │       ├── ArticlesPage.jsx
+│   │       ├── Dashboard.jsx
+│   │       ├── EditorArticlesPage.jsx
+│   │       ├── QueuePage.jsx
+│   │       └── StoriesPage.jsx
+│   ├── tailwind.config.js
+│   └── vite.config.js
+├── phase-04-script
+│   ├── backend
+│   │   ├── api.py
+│   │   ├── script_generator.py
+│   │   └── tts_generator.py
+│   ├── config
+│   │   ├── audio_presets.json
+│   │   ├── tts_config.json
+│   │   └── tts_usage.json
+│   ├── env.example
+│   ├── frontend
+│   │   └── src
+│   │       └── components
+│   │           ├── ScriptGenerationPanel.css
+│   │           └── ScriptGenerationPanel.jsx
+│   ├── migrations
+│   │   └── 004_phase4_scripts.sql
+│   ├── output
+│   │   └── scripts
+│   │       ├── 0b334c6b-df1e-463c-be94-a64fbe30af5d
+│   │       │   ├── captions.vtt
+│   │       │   ├── manifest.json
+│   │       │   ├── metadata.json
+│   │       │   └── tts_script.vtt
+│   │       ├── fb9a9b5c-d997-4ff6-b588-c3c7124b2e89
+│   │       │   ├── captions.vtt
+│   │       │   ├── manifest.json
+│   │       │   ├── metadata.json
+│   │       │   └── tts_script.vtt
+│   │       └── fe710fbd-1277-44db-a37d-00b2dc955200
+│   │           ├── captions.vtt
+│   │           ├── manifest.json
+│   │           ├── metadata.json
+│   │           └── tts_script.vtt
+│   └── requirements.txt
+└── reference_docs
+    ├── ARCHITECTURE.md
+    ├── DAM_PROPOSAL.md
+    ├── PHASE-03-EDITORIAL_REVIEW_DASHBOARD.md
+    └── PHASE1_ANALYSIS.md
+
+69 directories, 238 files
+apple@Apples-MacBook-Pro › ~/apps/video_automation_steps/pellacia_press › main✲
+╰╼

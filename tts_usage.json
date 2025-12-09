@@ -1,0 +1,24 @@
+{
+  "projects": [
+    {
+      "project_id": "451945710192",
+      "month": 12,
+      "chars_used": 817
+    },
+    {
+      "project_id": "news-tts-project2",
+      "month": 12,
+      "chars_used": 0
+    },
+    {
+      "project_id": "news-tts-project3",
+      "month": 12,
+      "chars_used": 0
+    },
+    {
+      "project_id": "news-tts-project4",
+      "month": 12,
+      "chars_used": 0
+    }
+  ]
+}

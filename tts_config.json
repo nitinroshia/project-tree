@@ -1,0 +1,47 @@
+{
+  "projects": [
+    {
+      "project_id": "451945710192",
+      "key_path": "/Users/apple/.gcp-keys/maximal-grin-472718-j3-4ae3abe1d9b6.json"
+    },
+    {
+      "project_id": "news-tts-project2",
+      "key_path": "~/.gcp-keys/news-tts-2.json"
+    },
+    {
+      "project_id": "news-tts-project3",
+      "key_path": "~/.gcp-keys/news-tts-3.json"
+    },
+    {
+      "project_id": "news-tts-project4",
+      "key_path": "~/.gcp-keys/news-tts-4.json"
+    }
+  ],
+  "safety_limit": 800000,
+  "voice_mapping": {
+    "breaking": {
+      "language_code": "en-US",
+      "name": "en-US-Chirp3-HD-Charon",
+      "speaking_rate": 1.1,
+      "pitch": 2.0
+    },
+    "tragic": {
+      "language_code": "en-US",
+      "name": "en-US-Chirp3-HD-Aoede",
+      "speaking_rate": 0.9,
+      "pitch": -2.0
+    },
+    "fake": {
+      "language_code": "en-US",
+      "name": "en-US-Chirp3-HD-Algieba",
+      "speaking_rate": 1.0,
+      "pitch": 0.0
+    },
+    "default": {
+      "language_code": "en-US",
+      "name": "en-US-Chirp3-HD-Charon",
+      "speaking_rate": 1.0,
+      "pitch": 0.0
+    }
+  }
+}

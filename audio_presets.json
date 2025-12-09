@@ -1,0 +1,111 @@
+{
+  "models": [
+    "gemini-2.0-pro-tts",
+    "chirp3-hd",
+    "neural2",
+    "wavenet"
+  ],
+  "languages": [
+    {
+      "code": "en-US",
+      "name": "English (US)"
+    },
+    {
+      "code": "en-GB",
+      "name": "English (UK)"
+    },
+    {
+      "code": "en-AU",
+      "name": "English (Australia)"
+    }
+  ],
+  "voices": {
+    "gemini-2.0-pro-tts": [
+      {
+        "name": "Puck",
+        "gender": "NEUTRAL"
+      },
+      {
+        "name": "Charon",
+        "gender": "NEUTRAL"
+      },
+      {
+        "name": "Kore",
+        "gender": "NEUTRAL"
+      },
+      {
+        "name": "Fenrir",
+        "gender": "NEUTRAL"
+      },
+      {
+        "name": "Aoede",
+        "gender": "NEUTRAL"
+      }
+    ],
+    "chirp3-hd": [
+      {
+        "name": "en-US-Chirp3-HD-Charon",
+        "gender": "NEUTRAL"
+      },
+      {
+        "name": "en-US-Chirp3-HD-Aoede",
+        "gender": "NEUTRAL"
+      }
+    ],
+    "neural2": [
+      {
+        "name": "en-US-Neural2-A",
+        "gender": "MALE"
+      },
+      {
+        "name": "en-US-Neural2-C",
+        "gender": "FEMALE"
+      },
+      {
+        "name": "en-US-Neural2-D",
+        "gender": "MALE"
+      }
+    ],
+    "wavenet": [
+      {
+        "name": "en-US-Wavenet-A",
+        "gender": "MALE"
+      },
+      {
+        "name": "en-US-Wavenet-C",
+        "gender": "FEMALE"
+      }
+    ]
+  },
+  "presets": {
+    "default": {
+      "model": "gemini-2.0-pro-tts",
+      "voice": "Puck",
+      "speakingRate": 1.0,
+      "pitch": 0.0,
+      "volumeGainDb": 0.0,
+      "sampleRateHertz": 24000
+    },
+    "breaking_news": {
+      "model": "gemini-2.0-pro-tts",
+      "voice": "Charon",
+      "speakingRate": 1.15,
+      "pitch": 2.0,
+      "volumeGainDb": 2.0,
+      "sampleRateHertz": 24000
+    },
+    "serious": {
+      "model": "gemini-2.0-pro-tts",
+      "voice": "Aoede",
+      "speakingRate": 0.9,
+      "pitch": -1.0,
+      "volumeGainDb": 0.0,
+      "sampleRateHertz": 24000
+    }
+  },
+  "caption_config": {
+    "maxCharsPerLine": 35,
+    "maxLines": 2,
+    "wordsPerMinute": 150
+  }
+}
